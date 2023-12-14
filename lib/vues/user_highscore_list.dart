@@ -23,7 +23,7 @@ class UserListPage extends StatelessWidget {
           return ListTile(
             title: Text('User ID: ${user.idUtilisateur}'),
             subtitle: Text('Role: ${user.role}'),
-            trailing: Text('Highscore: ${user.highscoreEasy}'), // Adjust according to your scoring system
+            trailing: Text('Highscore: ${user.highscore}'), // Adjust according to your scoring system
             onTap: () {
               // Navigate to UserDetailPage on tap
               Navigator.of(context).push(

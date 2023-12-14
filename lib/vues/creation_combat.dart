@@ -4,13 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 
-import 'package:provider/provider.dart';
-
 import '../main.dart';
 import '../models/game.dart';
-import '../providers/theme_provider.dart';
-
 import '../models/utilisateurs.dart';
+import '../providers/theme_provider.dart';
 import '../providers/utilisateur_provider.dart';
 
 void main() {
@@ -51,13 +48,13 @@ int getHighScore(BuildContext context) {
 }
 
 class MyGamingApp extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     return MaterialApp(
       title: 'Circle Timing Game',
       theme: themeProvider.themeData,
-
       home: MyGamePage(),
     );
   }
@@ -85,12 +82,12 @@ class _MyGamePageState extends State<MyGamePage> {
   @override
   void initState() {
     super.initState();
-    startRotation();
+
   }
 
   void generateAndDisplayTargetPosition() {
     double targetAngle = random.nextDouble() * 360;
-      //targetAngle = random.nextDouble() * 360;
+    //targetAngle = random.nextDouble() * 360;
 
     angle = (targetAngle + 90) % 360;
     double radius = 100; // Half of the container's width/height
@@ -181,10 +178,10 @@ class _MyGamePageState extends State<MyGamePage> {
       final box = Hive.box<Utilisateurs>('utilisateursBox');
       Utilisateurs? user = utilisateurProvider.user;
 
-        if (score > user!.highscore) {
-          user?.highscore = score;
-          box.put(utilisateurProvider.user?.idUtilisateur, user!);
-        }
+      if (score > user!.highscore) {
+        user?.highscore = score;
+        box.put(utilisateurProvider.user?.idUtilisateur, user!);
+      }
 
       Game newGame = Game(
         idGame: DateTime.now().millisecondsSinceEpoch.toString(), // Unique ID for the game
@@ -212,11 +209,11 @@ class _MyGamePageState extends State<MyGamePage> {
                 //resetGame();
 
                 Navigator.push(
-                    context,
-                    MaterialPageRoute(
+                  context,
+                  MaterialPageRoute(
                     builder: (context) =>
                         MyHomePage(title: '',),
-                ),
+                  ),
                 );
               },
               child: Text('Restart'),
@@ -235,7 +232,60 @@ class _MyGamePageState extends State<MyGamePage> {
       clockwiseRotation = true; // Reset rotation direction
     });
   }
+  bool isRedButton = true; // To track the color and text of the button
+  int DifficultyButton = 0;
+  int SpeedButton = 0;
+  Color difficultyTextColor = Colors.green; // Initial color for difficulty button text
+  Color speedTextColor = Colors.green;
+  List<String> difficultyOptions = ['0.75 X', '1.0 X', '1.25 X']; // Text options for difficulty button
+  List<String> speedOptions = ['Easy', 'Medium', 'Hard']; // Text options for speed button
 
+  void toggleRedButton() {
+    setState(() {
+      isRedButton = !isRedButton;
+    });
+  }
+  void toggleDifficultyButton() {
+    setState(() {
+      DifficultyButton++;
+      if(DifficultyButton > 2){
+        DifficultyButton = 0;
+      }
+      // Update difficulty button text color based on DifficultyButton value
+      switch (DifficultyButton) {
+        case 0:
+          difficultyTextColor = Colors.green;
+          break;
+        case 1:
+          difficultyTextColor = Colors.yellow; // Change to your desired color
+          break;
+        case 2:
+          difficultyTextColor = Colors.red; // Change to your desired color
+          break;
+
+      }}
+    );
+  }
+  void toggleSpeedButton() {
+    setState(() {
+      SpeedButton++;
+      if(SpeedButton > 2){
+        SpeedButton = 0;
+      }
+      // Update difficulty button text color based on DifficultyButton value
+      switch (SpeedButton) {
+        case 0:
+          speedTextColor = Colors.green;
+          break;
+        case 1:
+          speedTextColor = Colors.yellow; // Change to your desired color
+          break;
+        case 2:
+          speedTextColor = Colors.red; // Change to your desired color
+          break;
+      }}
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -302,26 +352,85 @@ class _MyGamePageState extends State<MyGamePage> {
                     ),
                   ),
 
-                  // Button at the bottom
+
                   Positioned(
-                    top: 300,
                     bottom: 0,
-                    left: 0,
+                    left: -17,
                     right: 0,
-                    child: Center(
-                      child: ElevatedButton(
-                        onPressed: handleButtonClick,
-                        child: Text(
-                          'Click Me!',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              toggleDifficultyButton();
+                            },
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all(
+                                Colors.blue,
+                              ),
+                            ),
+                            child: Text(
+                              difficultyOptions[DifficultyButton],
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: difficultyTextColor,
+                              ),
+                            ),
                           ),
-                        ),
+                          ElevatedButton(
+                            onPressed: () {
+                              toggleSpeedButton();
+                            },
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all(
+                                Colors.blue,
+                              ),
+                            ),
+                            child: Text(
+                              speedOptions[SpeedButton],
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: speedTextColor,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                ],
+
+                  // Click Me Button on top
+                  Positioned(
+                    bottom: 70, // Adjust this value to your desired position
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if(isRedButton){
+                          isRedButton = !isRedButton;
+                          startRotation();
+                        }
+                        else{
+                          handleButtonClick();
+                        }
+
+                      },
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(
+                          isRedButton ? Colors.red : Colors.blue,
+                        ),
+                      ),
+                      child: Text(
+                        isRedButton ? 'prêt' : 'Click Me!',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),],
               ),
             )
 
