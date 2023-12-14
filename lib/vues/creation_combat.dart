@@ -32,6 +32,7 @@ void openBox() async {
 
 Future<void> openBoxIfNeeded() async {
   if (!Hive.isBoxOpen('utilisateursBox')) {
+    print("opening box");
     await Hive.openBox<Utilisateurs>('utilisateursBox');
   }
 }
@@ -43,6 +44,7 @@ int getHighScore(BuildContext context) {
   //print("miammers");
 
   final currentUser = utilisateurProvider.user;
+  //print(currentUser?.highscoreEasy.toString());
   // Assuming Utilisateurs class has a highscore field
   return currentUser?.highscoreEasy ?? 0;
 }
@@ -168,26 +170,22 @@ class _MyGamePageState extends State<MyGamePage> {
 
   Future<void> showGameOverDialog() async {
 
-    //final utilisateurProvider = Provider.of<UtilisateurProvider>(context, listen: false);
-    //if (utilisateurProvider.isLoggedIn) {
-    //  print("MDR");
-//
-    //  await openBoxIfNeeded();
-//
-    //  final box = Hive.box<Utilisateurs>('utilisateursBox');
-    //  print(utilisateurProvider.user?.idUtilisateur);
-    //  final currentUserID = utilisateurProvider.user?.idUtilisateur;
-    //  if (currentUserID != null) {
-    //    final currentUser = box.get(currentUserID);
-    //    if (currentUser != null && score > currentUser.highscore) {
-    //      print("bruh2");
-    //      currentUser.highscore = score;
-    //      box.put(currentUserID, currentUser);
-    //    }
-    //  }
-    //  print("xd");
-//
-    //}
+    final utilisateurProvider = Provider.of<UtilisateurProvider>(context, listen: false);
+    if (utilisateurProvider.isLoggedIn) {
+
+      await openBoxIfNeeded();
+
+      final currentUser = utilisateurProvider.user;
+
+      final box = Hive.box<Utilisateurs>('utilisateursBox');
+      Utilisateurs? user = utilisateurProvider.user;
+
+        if (score > user!.highscoreEasy) {
+          user?.highscoreEasy = score;
+          box.put(utilisateurProvider.user?.idUtilisateur, user!);
+        }
+
+    }
     showDialog(
       context: context,
       barrierDismissible: false,
