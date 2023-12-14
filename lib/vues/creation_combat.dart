@@ -47,7 +47,7 @@ int getHighScore(BuildContext context) {
   final currentUser = utilisateurProvider.user;
   //print(currentUser?.highscoreEasy.toString());
   // Assuming Utilisateurs class has a highscore field
-  return currentUser?.highscoreEasy ?? 0;
+  return currentUser?.highscore ?? 0;
 }
 
 class MyGamingApp extends StatelessWidget {
@@ -181,8 +181,8 @@ class _MyGamePageState extends State<MyGamePage> {
       final box = Hive.box<Utilisateurs>('utilisateursBox');
       Utilisateurs? user = utilisateurProvider.user;
 
-        if (score > user!.highscoreEasy) {
-          user?.highscoreEasy = score;
+        if (score > user!.highscore) {
+          user?.highscore = score;
           box.put(utilisateurProvider.user?.idUtilisateur, user!);
         }
 

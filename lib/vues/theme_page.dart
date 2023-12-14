@@ -26,6 +26,16 @@ class ThemePage extends StatelessWidget {
               },
               child: Text('Toggle Theme'),
             ),
+            ///////////
+            //TextFormField(
+            //  initialValue: user?.username,
+            //  onFieldSubmitted: (newValue) {
+            //    user?.updateUsername(newValue);
+            //    // Save the updated user to Hive box
+            //    Hive.box<Utilisateurs>('utilisateurs').put(user?.idUtilisateur, user);
+            //  },
+            //),
+            ////////////
           ],
         ),
       ),
