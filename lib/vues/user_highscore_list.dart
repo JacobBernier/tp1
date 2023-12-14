@@ -21,7 +21,7 @@ class UserListPage extends StatelessWidget {
         itemBuilder: (context, index) {
           final user = users[index];
           return ListTile(
-            title: Text('User ID: ${user.idUtilisateur}'),
+            title: Text('User: ${user.username}'),
             subtitle: Text('Role: ${user.role}'),
             trailing: Text('Highscore: ${user.highscore}'), // Adjust according to your scoring system
             onTap: () {

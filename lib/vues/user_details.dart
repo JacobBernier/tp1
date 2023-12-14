@@ -11,7 +11,7 @@ class UserDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('User Details: ${user.idUtilisateur}'),
+        title: Text('User Details: ${user.username}'),
       ),
       body: Column(
         children: [

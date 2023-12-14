@@ -19,29 +19,35 @@ class UtilisateursAdapter extends TypeAdapter<Utilisateurs> {
     return Utilisateurs(
       idUtilisateur: fields[0] as String,
       role: fields[1] as String,
-      playedGames: (fields[5] as List).cast<Game>(),
+      playedGames: (fields[6] as List?)?.cast<Game>(),
+      username: fields[7] as String?,
     )
-      ..highscoreEasy = fields[2] as int
-      ..highscoreMedium = fields[3] as int
-      ..highscoreHard = fields[4] as int;
+      ..highscore = fields[2] as int
+      ..highscoreEasy = fields[3] as int
+      ..highscoreMedium = fields[4] as int
+      ..highscoreHard = fields[5] as int;
   }
 
   @override
   void write(BinaryWriter writer, Utilisateurs obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.idUtilisateur)
       ..writeByte(1)
       ..write(obj.role)
       ..writeByte(2)
-      ..write(obj.highscoreEasy)
+      ..write(obj.highscore)
       ..writeByte(3)
-      ..write(obj.highscoreMedium)
+      ..write(obj.highscoreEasy)
       ..writeByte(4)
-      ..write(obj.highscoreHard)
+      ..write(obj.highscoreMedium)
       ..writeByte(5)
-      ..write(obj.playedGames);
+      ..write(obj.highscoreHard)
+      ..writeByte(6)
+      ..write(obj.playedGames)
+      ..writeByte(7)
+      ..write(obj.username);
   }
 
   @override

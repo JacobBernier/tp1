@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
+import '../models/utilisateurs.dart';
 import '../providers/theme_provider.dart';
+import '../providers/utilisateur_provider.dart';
 
 class ThemePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
+    final utilisateurProvider = Provider.of<UtilisateurProvider>(context, listen: false);
+    //if (!utilisateurProvider.isLoggedIn) return 0;
+    //print("miammers");
 
+    final currentUser = utilisateurProvider.user;
     return Scaffold(
       appBar: AppBar(
         title: Text('Theme Changer'),
@@ -26,16 +33,16 @@ class ThemePage extends StatelessWidget {
               },
               child: Text('Toggle Theme'),
             ),
-            ///////////
-            //TextFormField(
-            //  initialValue: user?.username,
-            //  onFieldSubmitted: (newValue) {
-            //    user?.updateUsername(newValue);
-            //    // Save the updated user to Hive box
-            //    Hive.box<Utilisateurs>('utilisateurs').put(user?.idUtilisateur, user);
-            //  },
-            //),
-            ////////////
+            utilisateurProvider.isLoggedIn
+                ? TextFormField(
+              initialValue: currentUser?.username,
+              onFieldSubmitted: (newValue) {
+                currentUser?.updateUsername(newValue);
+                // Save the updated user to Hive box
+                Hive.box<Utilisateurs>('utilisateurs').put(currentUser?.idUtilisateur, currentUser!);
+              },
+            )
+                : Container(),
           ],
         ),
       ),
