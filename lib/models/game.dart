@@ -17,6 +17,7 @@ class Game{
   final int score;
   @HiveField(3)
   final int speed;
+
 }
 
 

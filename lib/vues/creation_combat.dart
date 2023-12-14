@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:provider/provider.dart';
 
 import '../main.dart';
+import '../models/game.dart';
 import '../providers/theme_provider.dart';
 
 import '../models/utilisateurs.dart';
@@ -184,6 +185,16 @@ class _MyGamePageState extends State<MyGamePage> {
           user?.highscoreEasy = score;
           box.put(utilisateurProvider.user?.idUtilisateur, user!);
         }
+
+      Game newGame = Game(
+        idGame: DateTime.now().millisecondsSinceEpoch.toString(), // Unique ID for the game
+        difficulty: 1, // Set the difficulty level here
+        score: score,
+        speed: 1, // Set the game speed here
+      );
+
+      user.playedGames.add(newGame);
+      box.put(utilisateurProvider.user?.idUtilisateur, user);
 
     }
     showDialog(
