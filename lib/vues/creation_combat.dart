@@ -1,11 +1,37 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:provider/provider.dart';
 
 import '../main.dart';
+import '../models/utilisateurs.dart';
+import '../providers/utilisateur_provider.dart';
 
 void main() {
   runApp(MyGamingApp());
+  openBox();
+}
+
+void openBox() async {
+  await Hive.openBox<Utilisateurs>('utilisateursBox');
+}
+
+Future<void> openBoxIfNeeded() async {
+  if (!Hive.isBoxOpen('utilisateursBox')) {
+    await Hive.openBox<Utilisateurs>('utilisateursBox');
+  }
+}
+
+int getHighScore(BuildContext context) {
+  //print("bruh---------------------------");
+  final utilisateurProvider = Provider.of<UtilisateurProvider>(context, listen: false);
+  if (!utilisateurProvider.isLoggedIn) return 0;
+  //print("miammers");
+
+  final currentUser = utilisateurProvider.user;
+  // Assuming Utilisateurs class has a highscore field
+  return currentUser?.highscoreEasy ?? 0;
 }
 
 class MyGamingApp extends StatelessWidget {
@@ -127,7 +153,28 @@ class _MyGamePageState extends State<MyGamePage> {
     generateAndDisplayTargetPosition();
   }
 
-  void showGameOverDialog() {
+  Future<void> showGameOverDialog() async {
+
+    //final utilisateurProvider = Provider.of<UtilisateurProvider>(context, listen: false);
+    //if (utilisateurProvider.isLoggedIn) {
+    //  print("MDR");
+//
+    //  await openBoxIfNeeded();
+//
+    //  final box = Hive.box<Utilisateurs>('utilisateursBox');
+    //  print(utilisateurProvider.user?.idUtilisateur);
+    //  final currentUserID = utilisateurProvider.user?.idUtilisateur;
+    //  if (currentUserID != null) {
+    //    final currentUser = box.get(currentUserID);
+    //    if (currentUser != null && score > currentUser.highscore) {
+    //      print("bruh2");
+    //      currentUser.highscore = score;
+    //      box.put(currentUserID, currentUser);
+    //    }
+    //  }
+    //  print("xd");
+//
+    //}
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -183,6 +230,10 @@ class _MyGamePageState extends State<MyGamePage> {
             ),
             Text(
               'Lives: $lives',
+              style: TextStyle(fontSize: 24),
+            ),
+            Text(
+              'High Score: ${getHighScore(context)}',
               style: TextStyle(fontSize: 24),
             ),
             Expanded(

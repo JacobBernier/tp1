@@ -14,7 +14,11 @@ class Utilisateurs{
   @HiveField(1)
   final String role;
   @HiveField(2)
-  final int highscore = 0;
+  int highscoreEasy = 0;
+  @HiveField(3)
+  int highscoreMedium = 0;
+  @HiveField(4)
+  int highscoreHard = 0;
 }
 
 

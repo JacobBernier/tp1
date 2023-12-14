@@ -8,6 +8,7 @@ import 'package:tp1/vues/creation_combat.dart';
 import 'package:tp1/vues/login.dart';
 import 'package:tp1/vues/profile.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:tp1/vues/user_profile.dart';
 
 
 import 'models/utilisateurs.dart';
@@ -131,6 +132,27 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Text('Play', style: TextStyle(fontSize: 24.0)), // Increase text size
             ),
             const SizedBox(height: 20), // Add spacing between buttons
+
+            // "View High Scores" button
+            ElevatedButton(
+              onPressed: () {
+                final utilisateurProvider = Provider.of<UtilisateurProvider>(context, listen: false);
+                final userId = utilisateurProvider.user?.idUtilisateur;
+                print('UserID passed to HighScoresPage: $userId');
+                if (userId != null) {
+                  Navigator.push(context, MaterialPageRoute(
+
+                    builder: (context) => HighScoresPage(userId: userId),
+                  ));
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.symmetric(horizontal: 32.0, vertical: 16.0),
+                textStyle: TextStyle(fontSize: 24.0),
+              ),
+              child: Text('View High Scores', style: TextStyle(fontSize: 24.0)),
+            ),
+            const SizedBox(height: 20),
             Consumer<UtilisateurProvider>(
               builder: (context, utilisateurProvider, child) {
                 return Center(

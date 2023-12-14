@@ -19,19 +19,26 @@ class UtilisateursAdapter extends TypeAdapter<Utilisateurs> {
     return Utilisateurs(
       idUtilisateur: fields[0] as String,
       role: fields[1] as String,
-    );
+    )
+      ..highscoreEasy = fields[2] as int
+      ..highscoreMedium = fields[3] as int
+      ..highscoreHard = fields[4] as int;
   }
 
   @override
   void write(BinaryWriter writer, Utilisateurs obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.idUtilisateur)
       ..writeByte(1)
       ..write(obj.role)
       ..writeByte(2)
-      ..write(obj.highscore);
+      ..write(obj.highscoreEasy)
+      ..writeByte(3)
+      ..write(obj.highscoreMedium)
+      ..writeByte(4)
+      ..write(obj.highscoreHard);
   }
 
   @override
