@@ -4,12 +4,25 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 
+import 'package:provider/provider.dart';
+
 import '../main.dart';
+import '../providers/theme_provider.dart';
+
 import '../models/utilisateurs.dart';
 import '../providers/utilisateur_provider.dart';
 
 void main() {
-  runApp(MyGamingApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => ThemeProvider(), // Initialize your theme provider here
+        ),
+      ],
+      child: MyApp(),
+    ),
+  );
   openBox();
 }
 
@@ -37,11 +50,11 @@ int getHighScore(BuildContext context) {
 class MyGamingApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return MaterialApp(
       title: 'Circle Timing Game',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      theme: themeProvider.themeData,
+
       home: MyGamePage(),
     );
   }
@@ -193,7 +206,7 @@ class _MyGamePageState extends State<MyGamePage> {
                     context,
                     MaterialPageRoute(
                     builder: (context) =>
-                    MyApp(),
+                        MyHomePage(title: '',),
                 ),
                 );
               },

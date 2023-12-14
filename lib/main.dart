@@ -9,7 +9,8 @@ import 'package:tp1/vues/login.dart';
 import 'package:tp1/vues/profile.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:tp1/vues/user_profile.dart';
-
+import 'package:tp1/vues/theme_page.dart';
+import 'providers/theme_provider.dart';
 
 import 'models/utilisateurs.dart';
 
@@ -47,11 +48,20 @@ Future seedDatabase() async {
 void main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(UtilisateursAdapter());
-
+  _utilisateursBox = await Hive.openBox<Utilisateurs>('utilisateurs');
   //await seedDatabase();
   await getBoxUtilisateurs();
 
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => ThemeProvider(), // Initialize your theme provider here
+        ),
+      ],
+      child: MyApp(),
+    ),
+  );
 }
 
 
@@ -62,24 +72,25 @@ class MyApp extends StatelessWidget {
   @override
 
   Widget build(BuildContext context) {
-    return
-      ChangeNotifierProvider(
-        create: (context) => UtilisateurProvider(
-        Auth0('dev-xzdjv7klxcuqi3rz.us.auth0.com',
-            'dYJVlhgM3HfUBlTpJceq91XikSIMMkQz'),
-        UtilisateursControleur(_utilisateursBox)),
-    child:MaterialApp(
-      title: 'Combat box',
-      theme: ThemeData(
-        useMaterial3: true,
-        brightness: Brightness.dark,
-      ),
+    final themeProvider = Provider.of<ThemeProvider>(context);
 
-      home: const MyHomePage(title: 'TP1 - Home Page'), // Page de démarrage
-      routes: {
-        '/page1': (context) => MyApp(),
-        '/page2': (context) => MyGamingApp(),
-      },
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => UtilisateurProvider(
+            Auth0('dev-xzdjv7klxcuqi3rz.us.auth0.com', 'dYJVlhgM3HfUBlTpJceq91XikSIMMkQz'),
+            UtilisateursControleur(_utilisateursBox),
+          ),
+        ),
+      ],
+      child: MaterialApp(
+        title: 'Combat box',
+        theme: themeProvider.themeData,
+        home: const MyHomePage(title: 'TP1 - Home Page'),
+        routes: {
+          '/page1': (context) => MyApp(),
+          '/page2': (context) => MyGamingApp(),
+        },
     ),
     );
   }
@@ -95,6 +106,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  void _navigateToThemePage(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ThemePage()), // ThemePage is the name of your theme change page
+    );
+  }
   @override
   void initState() {
     super.initState();
@@ -112,6 +129,15 @@ class _MyHomePageState extends State<MyHomePage> {
 @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+        leading: IconButton(
+          icon: Icon(Icons.settings), // Icon of an engrenage
+          onPressed: () {
+            _navigateToThemePage(context);
+          },
+        ),
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
