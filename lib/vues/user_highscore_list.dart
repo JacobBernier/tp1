@@ -12,9 +12,11 @@ class UserListPage extends StatelessWidget {
     final usersBox = Hive.box<Utilisateurs>('utilisateurs');
     final List<Utilisateurs> users = usersBox.values.toList();
 
+    users.sort((a, b) => b.highscore.compareTo(a.highscore));
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('User List'),
+        title: Text('User Highscores'),
       ),
       body: ListView.builder(
         itemCount: users.length,
@@ -22,7 +24,7 @@ class UserListPage extends StatelessWidget {
           final user = users[index];
           return ListTile(
             title: Text('User: ${user.username}'),
-            subtitle: Text('Role: ${user.role}'),
+            //subtitle: Text('Role: ${user.role}'),
             trailing: Text('Highscore: ${user.highscore}'), // Adjust according to your scoring system
             onTap: () {
               // Navigate to UserDetailPage on tap

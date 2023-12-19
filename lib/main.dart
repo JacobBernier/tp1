@@ -37,9 +37,13 @@ Future<void> getCombatListData() async {
 Future seedDatabase() async {
   _utilisateursBox = await Hive.openBox<Utilisateurs>('utilisateurs');
 
-  Utilisateurs admin = Utilisateurs(
-      role: 'analyste', idUtilisateur: 'auth0|654444f87c403dde6a25e8bb');
-  _utilisateursBox?.put(1, admin);
+  //Utilisateurs admin = Utilisateurs(
+  //    role: 'analyste', idUtilisateur: 'auth0|654444f87c403dde6a25e8bb');
+  //_utilisateursBox?.put(1, admin);
+
+  Utilisateurs user1 = Utilisateurs(
+      role: 'analyste', idUtilisateur: '633633232as32ws',username: 'jeremy');
+  _utilisateursBox?.put(1, user1);
 
   // Close the boxes after use
   await _utilisateursBox?.close();
@@ -50,7 +54,7 @@ void main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(UtilisateursAdapter());
   _utilisateursBox = await Hive.openBox<Utilisateurs>('utilisateurs');
-  //await seedDatabase();
+  await seedDatabase();
   await getBoxUtilisateurs();
 
   runApp(
@@ -174,7 +178,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 textStyle: TextStyle(fontSize: 24.0),
                 // Customize the button style as needed
               ),
-              child: Text('New Button', style: TextStyle(fontSize: 24.0)),
+              child: Text('Highscores', style: TextStyle(fontSize: 24.0)),
             ),
             const SizedBox(height: 20), // Add spacing between buttons
             const SizedBox(height: 20),

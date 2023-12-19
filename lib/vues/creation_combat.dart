@@ -36,14 +36,10 @@ Future<void> openBoxIfNeeded() async {
 }
 
 int getHighScore(BuildContext context) {
-  //print("bruh---------------------------");
   final utilisateurProvider = Provider.of<UtilisateurProvider>(context, listen: false);
   if (!utilisateurProvider.isLoggedIn) return 0;
-  //print("miammers");
 
   final currentUser = utilisateurProvider.user;
-  //print(currentUser?.highscoreEasy.toString());
-  // Assuming Utilisateurs class has a highscore field
   return currentUser?.highscore ?? 0;
 }
 
@@ -66,6 +62,8 @@ class MyGamePage extends StatefulWidget {
 }
 
 class _MyGamePageState extends State<MyGamePage> {
+  double tolerance = 20;
+  int speed = 16;
   int score = 0;
   int lives = 3;
   bool clockwiseRotation = true; // Added a flag to control rotation direction
@@ -113,7 +111,9 @@ class _MyGamePageState extends State<MyGamePage> {
 
   void startRotation() {
     generateAndDisplayTargetPosition();
-    Timer.periodic(Duration(milliseconds: 16), (timer) {
+    print("speed ");
+    print(speed);
+    Timer.periodic(Duration(milliseconds: speed), (timer) {
       setState(() {
         if (clockwiseRotation) {
           currentAngle += 1; // Rotate clockwise by 1 degree (adjust as needed)
@@ -127,7 +127,7 @@ class _MyGamePageState extends State<MyGamePage> {
   }
 
   void handleButtonClick() {
-    double tolerance = 20;
+
     double currentAngle2 = currentAngle % 360;
     print("Angle du shitos barre: " + currentAngle2.toString());
     print("Angle du bouton: " + angle.toString());
@@ -144,11 +144,6 @@ class _MyGamePageState extends State<MyGamePage> {
           lives--;
         });
       }
-
-
-
-
-
 
     }
     if (lives <= 0) {
@@ -182,12 +177,30 @@ class _MyGamePageState extends State<MyGamePage> {
         user?.highscore = score;
         box.put(utilisateurProvider.user?.idUtilisateur, user!);
       }
+      print(DifficultyButton);
+      if (DifficultyButton == 0 && user!.highscoreEasy < score) {
+
+        user?.highscoreEasy = score;
+        box.put(utilisateurProvider.user?.idUtilisateur, user!);
+      }
+      else if (DifficultyButton == 1 && user!.highscoreMedium < score) {
+        user?.highscoreMedium = score;
+        box.put(utilisateurProvider.user?.idUtilisateur, user!);
+      }
+      else if (DifficultyButton == 2 && user!.highscoreHard < score) {
+        user?.highscoreHard = score;
+        box.put(utilisateurProvider.user?.idUtilisateur, user!);
+      }
+
+      //if (utilisateurProvider.user != user) {
+      //  box.put(utilisateurProvider.user?.idUtilisateur, user!);
+      //}
 
       Game newGame = Game(
         idGame: DateTime.now().millisecondsSinceEpoch.toString(), // Unique ID for the game
-        difficulty: 1, // Set the difficulty level here
+        difficulty: DifficultyButton, // Set the difficulty level here
         score: score,
-        speed: 1, // Set the game speed here
+        speed: SpeedButton, // Set the game speed here
       );
 
       user.playedGames.add(newGame);
@@ -255,12 +268,15 @@ class _MyGamePageState extends State<MyGamePage> {
       switch (DifficultyButton) {
         case 0:
           difficultyTextColor = Colors.green;
+          tolerance = 20;
           break;
         case 1:
           difficultyTextColor = Colors.yellow; // Change to your desired color
+          tolerance = 15;
           break;
         case 2:
           difficultyTextColor = Colors.red; // Change to your desired color
+          tolerance = 10;
           break;
 
       }}
@@ -276,12 +292,15 @@ class _MyGamePageState extends State<MyGamePage> {
       switch (SpeedButton) {
         case 0:
           speedTextColor = Colors.green;
+          speed = 16;
           break;
         case 1:
           speedTextColor = Colors.yellow; // Change to your desired color
+          speed = 3;
           break;
         case 2:
           speedTextColor = Colors.red; // Change to your desired color
+          speed = 1;
           break;
       }}
     );
@@ -410,6 +429,7 @@ class _MyGamePageState extends State<MyGamePage> {
                       onPressed: () {
                         if(isRedButton){
                           isRedButton = !isRedButton;
+                          print(speed);
                           startRotation();
                         }
                         else{
