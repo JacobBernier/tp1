@@ -3,6 +3,7 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:provider/provider.dart';
 import 'package:tp1/vues/user_details.dart';
+import '../main.dart';
 import '../models/utilisateurs.dart';
 import '../providers/theme_provider.dart';
 
@@ -17,6 +18,18 @@ class UserListPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('User Highscores'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back), // Back arrow icon
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    MyHomePage(title: '',),
+              ),
+            ); // Navigate back when clicked
+          },
+        ),
       ),
       body: ListView.builder(
         itemCount: users.length,

@@ -1,7 +1,9 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:auth0_flutter/auth0_flutter.dart';
 import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sensors_plus/sensors_plus.dart';
 import 'package:tp1/controleurs/utilisateurs_controleur.dart';
 import 'package:tp1/providers/utilisateur_provider.dart';
 import 'package:tp1/vues/creation_combat.dart';
@@ -12,7 +14,6 @@ import 'package:tp1/vues/user_highscore_list.dart';
 import 'package:tp1/vues/user_profile.dart';
 import 'package:tp1/vues/theme_page.dart';
 import 'providers/theme_provider.dart';
-
 import 'models/utilisateurs.dart';
 
 // Commandes à rouler:
@@ -117,18 +118,40 @@ class _MyHomePageState extends State<MyHomePage> {
       MaterialPageRoute(builder: (context) => ThemePage()), // ThemePage is the name of your theme change page
     );
   }
+  void _listenToShake() {
+    accelerometerEventStream().listen((AccelerometerEvent event) {
+      double x = event.x;
+      double y = event.y;
+      double z = event.z;
+
+      // Calculate the speed (or the shake)
+      double speed = x.abs() + y.abs() + z.abs();
+
+      if (speed > 20) { // Define a suitable threshold
+        _changeTheme();
+        _playSound();
+      }
+    });
+  }
+  final AudioPlayer _audioPlayer = AudioPlayer();
+
+  void _playSound() {
+    _audioPlayer.play(AssetSource('sounds/maracas.mp3'));
+  }
+  void _changeTheme() {
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    themeProvider.toggleTheme();
+  }
+
+
   @override
   void initState() {
     super.initState();
+    _listenToShake();
   }
 
-  @override
-  //ajout
-  Future<void> _orderFilterCombatListData(
-      int? btnNumber, String? filter) async {
-    await getCombatListData();
-    setState(() {});
-  }
+
+
 
 
 @override
