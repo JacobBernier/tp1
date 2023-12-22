@@ -38,13 +38,13 @@ Future<void> getCombatListData() async {
 Future seedDatabase() async {
   _utilisateursBox = await Hive.openBox<Utilisateurs>('utilisateurs');
 
-  //Utilisateurs admin = Utilisateurs(
-  //    role: 'analyste', idUtilisateur: 'auth0|654444f87c403dde6a25e8bb');
-  //_utilisateursBox?.put(1, admin);
+  Utilisateurs admin = Utilisateurs(
+      role: 'analyste', idUtilisateur: 'auth0|654444f87c403dde6a25e8bb');
+  _utilisateursBox?.put(1, admin);
 
   Utilisateurs user1 = Utilisateurs(
-      role: 'analyste', idUtilisateur: '633633232as32ws',username: 'jeremy');
-  _utilisateursBox?.put(1, user1);
+      role: 'user', idUtilisateur: '633633232as32ws',username: 'jeremy');
+  _utilisateursBox?.put(2, user1);
 
   // Close the boxes after use
   await _utilisateursBox?.close();
@@ -94,8 +94,14 @@ class MyApp extends StatelessWidget {
         theme: themeProvider.themeData,
         home: const MyHomePage(title: 'TP1 - Home Page'),
         routes: {
-          '/page1': (context) => MyApp(),
-          '/page2': (context) => MyGamingApp(),
+          '/page1': (context) {
+            print('Navigating to /page1');
+            return MyApp();
+          },
+          '/page2': (context) {
+            print('Navigating to /page2');
+            return MyGamingApp();
+          },
         },
     ),
     );
@@ -147,6 +153,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    print('Init State of MyHomePage');
     _listenToShake();
   }
 
@@ -158,7 +165,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        //title: Text(widget.title),
         leading: IconButton(
           icon: Icon(Icons.settings), // Icon of an engrenage
           onPressed: () {

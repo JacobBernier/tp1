@@ -30,7 +30,7 @@ void openBox() async {
 
 Future<void> openBoxIfNeeded() async {
   if (!Hive.isBoxOpen('utilisateursBox')) {
-    print("opening box");
+    //print("opening box");
     await Hive.openBox<Utilisateurs>('utilisateursBox');
   }
 }
@@ -74,13 +74,14 @@ class _MyGamePageState extends State<MyGamePage> {
   double clickTargetWidth = 25;
   double clickTargetHeight = 25;
   bool clickTargetVisible = false;
+  final GlobalKey blueCircleKey = GlobalKey();
 
   double angle = 0;
   Random random = Random();
   @override
   void initState() {
     super.initState();
-
+    //print('Init State of MyGamePage');
   }
 
   void generateAndDisplayTargetPosition() {
@@ -96,11 +97,35 @@ class _MyGamePageState extends State<MyGamePage> {
     //Size screenSize = MediaQuery.of(context).size;
     //double centerX = screenSize.width / 2;
     //double centerY = screenSize.height / 2;
-    double centerX = 100;
-    double centerY = 325;
+
+    RenderBox renderBox = blueCircleKey.currentContext!.findRenderObject() as RenderBox;
+    double centerX = renderBox.size.width / 2;
+    double centerY = renderBox.size.height / 2;
+
+    //double centerX = 100;
+    //double centerY = 325;
     double x = centerX + radius * cos(radians) - (clickTargetWidth / 2);
     double y = centerY + radius * sin(radians) - (clickTargetHeight / 2);
-
+    //print('--------------');
+//
+    //print('TARGET XXXX BEFORE ' + x.toString());
+    //print('TARGET YYYY BEFORE ' + y.toString());
+    //// Adjust x and y to be negative if needed
+    ////if (x > centerX) {
+    ////  x = centerX - (x - centerX);
+    ////}
+    ////if (y > centerY) {
+    ////  y = centerY - (y - centerY);
+    ////}
+//
+    //print('TARGET ANGLE BASE ' + angle.toString());
+    //print('TARGET ANGLE ' + targetAngle.toString());
+//
+    //print('TARGET XXXX ' + x.toString());
+    //print('TARGET YYYY ' + y.toString());
+    //print('--------------');
+    //print('--------------');
+    //print('--------------');
 
     setState(() {
       clickTargetX = x;
@@ -109,10 +134,9 @@ class _MyGamePageState extends State<MyGamePage> {
     });
   }
 
+
   void startRotation() {
     generateAndDisplayTargetPosition();
-    print("speed ");
-    print(speed);
     Timer.periodic(Duration(milliseconds: speed), (timer) {
       setState(() {
         if (clockwiseRotation) {
@@ -133,7 +157,7 @@ class _MyGamePageState extends State<MyGamePage> {
     print("Angle du bouton: " + angle.toString());
 
     //angle = (targetAngle + 90) % 360;
-    print((currentAngle2 - angle).abs());
+    //print((currentAngle2 - angle).abs());
     if ((currentAngle2 - angle).abs() <= tolerance && lives > 0) {
       setState(() {
         score++;
@@ -172,22 +196,23 @@ class _MyGamePageState extends State<MyGamePage> {
 
       final box = Hive.box<Utilisateurs>('utilisateursBox');
       Utilisateurs? user = utilisateurProvider.user;
+      print('GAMEOVER-------------');
 
       if (score > user!.highscore) {
         user?.highscore = score;
         box.put(utilisateurProvider.user?.idUtilisateur, user!);
       }
-      print(DifficultyButton);
-      if (DifficultyButton == 0 && user!.highscoreEasy < score) {
+      print(SpeedButton);
+      if (SpeedButton == 0 && user!.highscoreEasy < score) {
 
         user?.highscoreEasy = score;
         box.put(utilisateurProvider.user?.idUtilisateur, user!);
       }
-      else if (DifficultyButton == 1 && user!.highscoreMedium < score) {
+      else if (SpeedButton == 1 && user!.highscoreMedium < score) {
         user?.highscoreMedium = score;
         box.put(utilisateurProvider.user?.idUtilisateur, user!);
       }
-      else if (DifficultyButton == 2 && user!.highscoreHard < score) {
+      else if (SpeedButton == 2 && user!.highscoreHard < score) {
         user?.highscoreHard = score;
         box.put(utilisateurProvider.user?.idUtilisateur, user!);
       }
@@ -198,9 +223,9 @@ class _MyGamePageState extends State<MyGamePage> {
 
       Game newGame = Game(
         idGame: DateTime.now().millisecondsSinceEpoch.toString(), // Unique ID for the game
-        difficulty: DifficultyButton, // Set the difficulty level here
+        difficulty: SpeedButton, // Set the difficulty level here
         score: score,
-        speed: SpeedButton, // Set the game speed here
+        speed: DifficultyButton, // Set the game precision here
       );
 
       user.playedGames.add(newGame);
@@ -217,9 +242,9 @@ class _MyGamePageState extends State<MyGamePage> {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                //Navigator.pop(context);
-                //Navigator.of(context).pop();
-                //resetGame();
+                Navigator.pop(context);
+                Navigator.of(context).pop();
+                resetGame();
 
                 Navigator.push(
                   context,
@@ -228,6 +253,9 @@ class _MyGamePageState extends State<MyGamePage> {
                         MyHomePage(title: '',),
                   ),
                 );
+                //Navigator.pushReplacement(context, '/page1');
+                //Navigator.popUntil(context, ModalRoute.withName('/page2'));
+
               },
               child: Text('Restart'),
             ),
@@ -327,35 +355,36 @@ class _MyGamePageState extends State<MyGamePage> {
               'High Score: ${getHighScore(context)}',
               style: TextStyle(fontSize: 24),
             ),
-            Expanded(
+            // Blue circle centered on the screen
+        Padding(
+          padding: EdgeInsets.all(16.0),
+            child:
+            Container(
+              key: blueCircleKey, // Assign the GlobalKey here
+              width: 200,
+              height: 200,
+
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.lightBlue,
+              ),
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  // Light blue circle container
-                  Container(
-                    width: 200,
-                    height: 200,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.lightBlue,
-                    ),
-                  ),
-                  // Green target (click target)
+                  // Target circle (green) centered on the blue circle
                   Positioned(
                     left: clickTargetX,
                     top: clickTargetY,
-                    child: Visibility(
-                      visible: clickTargetVisible,
-                      child: Container(
-                        width: clickTargetWidth,
-                        height: clickTargetHeight,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.green,
-                        ),
+                    child: Container(
+                      width: clickTargetWidth,
+                      height: clickTargetHeight,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.green,
                       ),
                     ),
                   ),
+
                   // Rotating red line
                   Transform.rotate(
                     angle: (currentAngle / 180) * pi,
@@ -370,90 +399,70 @@ class _MyGamePageState extends State<MyGamePage> {
                       ),
                     ),
                   ),
-
-
-                  Positioned(
-                    bottom: 0,
-                    left: -17,
-                    right: 0,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 16),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              toggleDifficultyButton();
-                            },
-                            style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(
-                                Colors.blue,
-                              ),
-                            ),
-                            child: Text(
-                              difficultyOptions[DifficultyButton],
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: difficultyTextColor,
-                              ),
-                            ),
-                          ),
-                          ElevatedButton(
-                            onPressed: () {
-                              toggleSpeedButton();
-                            },
-                            style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(
-                                Colors.blue,
-                              ),
-                            ),
-                            child: Text(
-                              speedOptions[SpeedButton],
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: speedTextColor,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                  // Click Me Button on top
-                  Positioned(
-                    bottom: 70, // Adjust this value to your desired position
-                    child: ElevatedButton(
-                      onPressed: () {
-                        if(isRedButton){
-                          isRedButton = !isRedButton;
-                          print(speed);
-                          startRotation();
-                        }
-                        else{
-                          handleButtonClick();
-                        }
-
-                      },
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(
-                          isRedButton ? Colors.red : Colors.blue,
-                        ),
-                      ),
-                      child: Text(
-                        isRedButton ? 'prêt' : 'Click Me!',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),],
+                ],
               ),
-            )
-
+            ),
+        ),
+            // Buttons can be placed outside the blue circle container
+            ElevatedButton(
+              onPressed: () {
+                toggleDifficultyButton();
+              },
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(
+                  Colors.blue,
+                ),
+              ),
+              child: Text(
+                difficultyOptions[DifficultyButton],
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: difficultyTextColor,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                toggleSpeedButton();
+              },
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(
+                  Colors.blue,
+                ),
+              ),
+              child: Text(
+                speedOptions[SpeedButton],
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: speedTextColor,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (isRedButton) {
+                  isRedButton = !isRedButton;
+                  print(speed);
+                  startRotation();
+                } else {
+                  handleButtonClick();
+                }
+              },
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(
+                  isRedButton ? Colors.red : Colors.blue,
+                ),
+              ),
+              child: Text(
+                isRedButton ? 'prêt' : 'Click Me!',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
           ],
         ),
       ),
