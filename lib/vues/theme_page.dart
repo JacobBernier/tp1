@@ -16,7 +16,7 @@ class ThemePage extends StatelessWidget {
     final currentUser = utilisateurProvider.user;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Theme Changer'),
+        title: Text('Parameters'),
       ),
       body: Center(
         child: Column(

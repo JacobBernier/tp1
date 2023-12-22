@@ -78,7 +78,7 @@ class _MyGamePageState extends State<MyGamePage> {
   bool isDifficultyButtonVisible = true;
   bool isSpeedButtonVisible = true;
   bool isTargetVisible = false;
-
+  Timer? rotationTimer;
   double angle = 0;
   Random random = Random();
   @override
@@ -139,11 +139,12 @@ class _MyGamePageState extends State<MyGamePage> {
 
 
   void startRotation() {
+    print('mdr');
     setState(() {
       isTargetVisible = true;
     });
     generateAndDisplayTargetPosition();
-    Timer.periodic(Duration(milliseconds: speed), (timer) {
+    rotationTimer = Timer.periodic(Duration(milliseconds: speed), (timer) {
       setState(() {
         if (clockwiseRotation) {
           currentAngle += 1; // Rotate clockwise by 1 degree (adjust as needed)
@@ -154,6 +155,10 @@ class _MyGamePageState extends State<MyGamePage> {
 
       });
     });
+  }
+
+  void stopRotation() {
+    rotationTimer?.cancel(); // Stop the rotation timer
   }
 
   void handleButtonClick() {
@@ -248,20 +253,8 @@ class _MyGamePageState extends State<MyGamePage> {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.pop(context);
-                Navigator.of(context).pop();
-                resetGame();
-
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        MyHomePage(title: '',),
-                  ),
-                );
-                //Navigator.pushReplacement(context, '/page1');
-                //Navigator.popUntil(context, ModalRoute.withName('/page2'));
-
+                Navigator.of(context).pop(); // Close the dialog
+                resetGame(); // Reset the game
               },
               child: Text('Restart'),
             ),
@@ -272,13 +265,21 @@ class _MyGamePageState extends State<MyGamePage> {
   }
 
   void resetGame() {
+    stopRotation();
+
     setState(() {
       score = 0;
       lives = 3;
-      targetAngle = 0;//Random().nextDouble() * 360;
-      clockwiseRotation = true; // Reset rotation direction
+      targetAngle = Random().nextDouble() * 360;
+      currentAngle = 0;
+      clockwiseRotation = true;
+      isDifficultyButtonVisible = true;
+      isSpeedButtonVisible = true;
+      isTargetVisible = false;
+      isRedButton = true;
     });
   }
+
   bool isRedButton = true; // To track the color and text of the button
   int DifficultyButton = 0;
   int SpeedButton = 0;

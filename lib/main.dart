@@ -10,6 +10,7 @@ import 'package:tp1/vues/creation_combat.dart';
 import 'package:tp1/vues/login.dart';
 import 'package:tp1/vues/profile.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:tp1/vues/shake_message.dart';
 import 'package:tp1/vues/user_highscore_list.dart';
 import 'package:tp1/vues/user_profile.dart';
 import 'package:tp1/vues/theme_page.dart';
@@ -118,14 +119,28 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  DateTime _lastShakeTime = DateTime.now();
+
   void _navigateToThemePage(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => ThemePage()), // ThemePage is the name of your theme change page
     );
   }
+  void _navigateToGamePage(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => MyGamePage()), // ThemePage is the name of your theme change page
+    );
+  }
   void _listenToShake() {
     accelerometerEventStream().listen((AccelerometerEvent event) {
+      DateTime now = DateTime.now();
+      if (_lastShakeTime != null && now.difference(_lastShakeTime).inSeconds < 1) {
+        // If the last shake was less than 1 second ago, ignore this shake
+        return;
+      }
+
       double x = event.x;
       double y = event.y;
       double z = event.z;
@@ -136,6 +151,7 @@ class _MyHomePageState extends State<MyHomePage> {
       if (speed > 20) { // Define a suitable threshold
         _changeTheme();
         _playSound();
+        _lastShakeTime = now;
       }
     });
   }
@@ -161,7 +177,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
 
 
-@override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -173,60 +189,66 @@ class _MyHomePageState extends State<MyHomePage> {
           },
         ),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // "Play" button
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(
-
-                  builder: (context) => MyGamingApp(),
+      body: Stack(
+        children: [
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // "Play" button
+                ElevatedButton(
+                  onPressed: () {
+                    _navigateToGamePage(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: 32.0, vertical: 16.0), // Adjust padding
+                    textStyle: TextStyle(fontSize: 24.0), // Increase text size
+                  ),
+                  child: Text('Play', style: TextStyle(fontSize: 24.0)), // Increase text size
                 ),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(horizontal: 32.0, vertical: 16.0), // Adjust padding
-                textStyle: TextStyle(fontSize: 24.0), // Increase text size
-              ),
-              child: Text('Play', style: TextStyle(fontSize: 24.0)), // Increase text size
-            ),
-            const SizedBox(height: 20), // Add spacing between buttons
+                const SizedBox(height: 20), // Add spacing between buttons
 
-            // New button
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(
-
-                  builder: (context) => MyPageUserListApp(),
+                // New button
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MyPageUserListApp(),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: 32.0, vertical: 16.0),
+                    textStyle: TextStyle(fontSize: 24.0),
+                    // Customize the button style as needed
+                  ),
+                  child: Text('Highscores', style: TextStyle(fontSize: 24.0)),
                 ),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(horizontal: 32.0, vertical: 16.0),
-                textStyle: TextStyle(fontSize: 24.0),
-                // Customize the button style as needed
-              ),
-              child: Text('Highscores', style: TextStyle(fontSize: 24.0)),
+                const SizedBox(height: 20), // Add spacing between buttons
+                const SizedBox(height: 20),
+                Consumer<UtilisateurProvider>(
+                  builder: (context, utilisateurProvider, child) {
+                    return Center(
+                        child: utilisateurProvider.isAuthenticating
+                            ? const CircularProgressIndicator()
+                            : utilisateurProvider.isLoggedIn
+                            ? Profile()
+                            : Login());
+                  },
+                ),
+              ],
             ),
-            const SizedBox(height: 20), // Add spacing between buttons
-            const SizedBox(height: 20),
-            Consumer<UtilisateurProvider>(
-              builder: (context, utilisateurProvider, child) {
-                return Center(
-                    child: utilisateurProvider.isAuthenticating
-                        ? const CircularProgressIndicator()
-                        : utilisateurProvider.isLoggedIn
-                        ? Profile()
-                        : Login());
-              },
-            ),
-          ],
-        ),
+          ),
+          Positioned(
+            top: 16, // Adjust the top position as needed
+            right: 16, // Adjust the right position as needed
+            child: ShakeMessage(), // Custom widget for the shake message
+          ),
+        ],
       ),
     );
   }
-
-
 }
