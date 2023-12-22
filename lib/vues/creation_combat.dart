@@ -75,6 +75,9 @@ class _MyGamePageState extends State<MyGamePage> {
   double clickTargetHeight = 25;
   bool clickTargetVisible = false;
   final GlobalKey blueCircleKey = GlobalKey();
+  bool isDifficultyButtonVisible = true;
+  bool isSpeedButtonVisible = true;
+  bool isTargetVisible = false;
 
   double angle = 0;
   Random random = Random();
@@ -136,6 +139,9 @@ class _MyGamePageState extends State<MyGamePage> {
 
 
   void startRotation() {
+    setState(() {
+      isTargetVisible = true;
+    });
     generateAndDisplayTargetPosition();
     Timer.periodic(Duration(milliseconds: speed), (timer) {
       setState(() {
@@ -310,6 +316,20 @@ class _MyGamePageState extends State<MyGamePage> {
       }}
     );
   }
+  void handleScreenTap() {
+    if (isRedButton) {
+      setState(() {
+        isDifficultyButtonVisible = false;
+        isSpeedButtonVisible = false;
+      });
+      isRedButton = !isRedButton;
+      print(speed);
+      startRotation();
+    } else {
+      handleButtonClick();
+    }
+  }
+
   void toggleSpeedButton() {
     setState(() {
       SpeedButton++;
@@ -339,7 +359,9 @@ class _MyGamePageState extends State<MyGamePage> {
       appBar: AppBar(
         title: Text('Circle Timing Game'),
       ),
-      body: Center(
+    body: GestureDetector(
+    onTap: handleScreenTap,
+    child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -375,15 +397,19 @@ class _MyGamePageState extends State<MyGamePage> {
                   Positioned(
                     left: clickTargetX,
                     top: clickTargetY,
-                    child: Container(
-                      width: clickTargetWidth,
-                      height: clickTargetHeight,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.green,
+                    child: Visibility(
+                      visible: isTargetVisible,
+                      child: Container(
+                        width: clickTargetWidth,
+                        height: clickTargetHeight,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.green,
+                        ),
                       ),
                     ),
                   ),
+
 
                   // Rotating red line
                   Transform.rotate(
@@ -404,45 +430,57 @@ class _MyGamePageState extends State<MyGamePage> {
             ),
         ),
             // Buttons can be placed outside the blue circle container
-            ElevatedButton(
-              onPressed: () {
-                toggleDifficultyButton();
-              },
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(
-                  Colors.blue,
+
+            Visibility(
+              visible: isDifficultyButtonVisible,
+              child: ElevatedButton(
+                onPressed: () {
+                  toggleDifficultyButton();
+                },
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(
+                    Colors.blue,
+                  ),
                 ),
-              ),
-              child: Text(
-                difficultyOptions[DifficultyButton],
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: difficultyTextColor,
-                ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                toggleSpeedButton();
-              },
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(
-                  Colors.blue,
-                ),
-              ),
-              child: Text(
-                speedOptions[SpeedButton],
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: speedTextColor,
+                child: Text(
+                  difficultyOptions[DifficultyButton],
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: difficultyTextColor,
+                  ),
                 ),
               ),
             ),
+            Visibility(
+              visible: isSpeedButtonVisible,
+              child: ElevatedButton(
+                onPressed: () {
+                  toggleSpeedButton();
+                },
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(
+                    Colors.blue,
+                  ),
+                ),
+                child: Text(
+                  speedOptions[SpeedButton],
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: speedTextColor,
+                  ),
+                ),
+              ),
+            ),
+
             ElevatedButton(
               onPressed: () {
                 if (isRedButton) {
+                  setState(() {
+                    isDifficultyButtonVisible = false;
+                    isSpeedButtonVisible = false;
+                  });
                   isRedButton = !isRedButton;
                   print(speed);
                   startRotation();
@@ -466,6 +504,8 @@ class _MyGamePageState extends State<MyGamePage> {
           ],
         ),
       ),
+    ),
+
     );
   }
 }
