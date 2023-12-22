@@ -23,7 +23,7 @@ class _UserDetailPageState extends State<UserDetailPage> {
         title: Text('User Details: ${widget.user.username}'),
         actions: [
           // Reset highscores icon
-          if (utilisateurProvider.user?.role == 'analyste')
+          if (utilisateurProvider.user?.role == 'admin')
             IconButton(
               icon: Icon(Icons.refresh),
               onPressed: () {

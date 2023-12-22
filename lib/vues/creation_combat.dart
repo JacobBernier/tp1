@@ -25,13 +25,13 @@ void main() {
 }
 
 void openBox() async {
-  await Hive.openBox<Utilisateurs>('utilisateursBox');
+  await Hive.openBox<Utilisateurs>('utilisateurs');
 }
 
 Future<void> openBoxIfNeeded() async {
-  if (!Hive.isBoxOpen('utilisateursBox')) {
+  if (!Hive.isBoxOpen('utilisateurs')) {
     //print("opening box");
-    await Hive.openBox<Utilisateurs>('utilisateursBox');
+    await Hive.openBox<Utilisateurs>('utilisateurs');
   }
 }
 
@@ -81,10 +81,21 @@ class _MyGamePageState extends State<MyGamePage> {
   Timer? rotationTimer;
   double angle = 0;
   Random random = Random();
+  late Utilisateurs currentUser;
   @override
   void initState() {
     super.initState();
-    //print('Init State of MyGamePage');
+    loadCurrentUser();
+  }
+
+  void loadCurrentUser() async {
+    final utilisateurProvider = Provider.of<UtilisateurProvider>(context, listen: false);
+
+    if (utilisateurProvider.isLoggedIn) {
+      final box = await Hive.openBox<Utilisateurs>('utilisateurs');
+      currentUser = box.get(utilisateurProvider.user?.idUtilisateur)!; // Load the user or create a new one if not found
+      setState(() {});
+    }
   }
 
   void generateAndDisplayTargetPosition() {
@@ -205,7 +216,7 @@ class _MyGamePageState extends State<MyGamePage> {
 
       final currentUser = utilisateurProvider.user;
 
-      final box = Hive.box<Utilisateurs>('utilisateursBox');
+      final box = Hive.box<Utilisateurs>('utilisateurs');
       Utilisateurs? user = utilisateurProvider.user;
       print('GAMEOVER-------------');
 
@@ -240,6 +251,9 @@ class _MyGamePageState extends State<MyGamePage> {
       );
 
       user.playedGames.add(newGame);
+
+      //final box2 = await Hive.openBox<Utilisateurs>('utilisateursBox');
+      //box2.put(utilisateurProvider.user?.idUtilisateur, currentUser!);
       box.put(utilisateurProvider.user?.idUtilisateur, user);
 
     }

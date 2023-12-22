@@ -40,7 +40,7 @@ Future seedDatabase() async {
   _utilisateursBox = await Hive.openBox<Utilisateurs>('utilisateurs');
 
   Utilisateurs admin = Utilisateurs(
-      role: 'analyste', idUtilisateur: 'auth0|654444f87c403dde6a25e8bb');
+      role: 'admin', idUtilisateur: 'auth0|654444f87c403dde6a25e8bb');
   _utilisateursBox?.put(1, admin);
 
   Utilisateurs user1 = Utilisateurs(
